@@ -1,0 +1,70 @@
+import cv2
+import random
+import numpy as np
+from matplotlib import pyplot as plt
+
+img_beauty_path = 'C:\\Users\\99790\\Desktop\\picture\\beauty.jpg'
+img_beauty = cv2.imread(img_beauty_path,1)
+
+
+
+def color_change_of_background(img1,color=(255,0,0)):
+    img=cv2.resize(img1,None,fx=0.5,fy=0.5)  #将图片进行缩放
+    rows,cols,channels = img.shape
+    hsv=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)     #BGR通道toHSV通道
+    lower_white=np.array([0,0,221])             #白色的颜色区间
+    upper_white=np.array([180,30,255])
+    
+    
+    #将低于lower_red和高于upper_red的部分分别变成0/黑色，lower_red～upper_red之间的值变成255/白色
+    mask = cv2.inRange(hsv, lower_white, upper_white)
+    
+    
+    #先腐蚀后膨胀，消除人像中白点
+    erode=cv2.erode(mask,None,iterations=1)
+    dilate=cv2.dilate(erode,None,iterations=1)
+    
+    for i in range(rows):
+        for j in range(cols):
+            if dilate[i,j]==255:
+                img[i,j]=color#此处替换颜色，为BGR通道
+    cv2.imshow('res',img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+color_change_of_background(img_beauty,(100,100,100))
+
+
+rows,cols,channels = img_beauty.shape
+img=cv2.resize(img_beauty,None,fx=0.5,fy=0.5)  #将图片进行缩放
+rows,cols,channels = img.shape
+cv2.imshow('img',img)
+key = cv2.waitKey()
+if key == 27:
+    cv2.destroyAllWindows()
+
+
+hsv=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)     #BGR通道toHSV通道
+lower_white=np.array([0,0,221])             #白色的颜色区间
+upper_white=np.array([180,30,255])
+#将低于lower_red和高于upper_red的部分分别变成0/黑色，lower_red～upper_red之间的值变成255/白色
+mask = cv2.inRange(hsv, lower_white, upper_white) 
+cv2.imshow('Mask', mask)
+key = cv2.waitKey()
+if key == 27:
+    cv2.destroyAllWindows()
+
+
+#先腐蚀后膨胀，消除人像中白点
+erode=cv2.erode(mask,None,iterations=1)
+dilate=cv2.dilate(erode,None,iterations=1)
+
+
+for i in range(rows):
+    for j in range(cols):
+        if dilate[i,j]==255:
+            img[i,j]=(0,0,0)#此处替换颜色，为BGR通道
+cv2.imshow('res',img)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
